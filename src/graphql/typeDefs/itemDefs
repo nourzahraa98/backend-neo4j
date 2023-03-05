@@ -1,0 +1,18 @@
+export const itemDefs=`
+type Item{
+    itemID:ID! @id
+    name:String!
+    image: Int
+    status: String
+    rate: Rate
+}
+
+enum Rate{
+    bad
+    good
+    wow
+}
+
+
+
+`;
