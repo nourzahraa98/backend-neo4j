@@ -1,0 +1,198 @@
+
+typeDefs/
+---------------------------------userDefs.ts----------------------------------
+
+
+export const userDefs = `
+type User{
+    id: ID! @id
+    name: String!
+    email: String!
+    password: String! @auth(rules: [{ allow: { id: "$jwt.sub" } }]) @private
+    userType: String!
+    phone: String
+    profileUrl: String
+    language: String
+    location: Point
+    businesses:[Business!]!@relationship(type:"OWNS",direction:OUT)
+} 
+`;
+
+----------------------------itemDefs.ts--------------------------------------------
+
+export const itemDefs=`
+type Item{
+    item_it:ID! @id
+    name:String!
+    image: Int
+    status: String
+    rate: Rate
+}
+enum Rate{
+    bad
+    good
+    wow
+}
+`;
+
+------------------------categoryDefs.ts-------------------------------------------
+
+export const categoryDefs=`
+type Category{
+    cat_id: ID! @id
+    name: String!
+    description:String!
+    items:[Item!]! @relationship (type:"Has", properties: "Quantity",direction:OUT)
+    
+    interface Quantity @relationshipProperties {
+        number: int
+    }
+}
+`;
+---------------------------businessDefs.ts-----------------------------------------
+
+export const businessDefs=`
+type Business{
+
+    bid: ID! @id
+    bname: String!
+    categories:[Category!]! @relationship (type:"Has",direction:OUT)
+}
+`
+;
+
+
+
+
+Create Users:
+mutation($name:String!,$email:String!,$userType:String!,$phone:String,$profileUrl:String,$language:String){
+createUsers(input:{name:$name,email:$email,userType:$userType,phone:$phone,profileUrl:$profileUrl,language:$language}){
+users{
+id 
+name
+email
+userType
+phone
+}
+}
+}
+
+
+
+
+
+
+------------------------------------variables---------------------------
+{
+    "name":"nour",
+    "email":"nour@gmail.com",
+    "userType": "Manager",
+    "phone":"96170029360",
+    "profileUrl":"www.linkedin/nour98.ocm",
+    "language":"eng"
+
+}
+{
+    "name":"Hussien Darwich",
+    "email":"hussien_darwich@gmail.com",
+    "userType": "employee",
+    "phone":"96171789654",
+    "profileUrl":"www.linkedin/HussienDarwich.ocm",
+    "language":"eng"
+
+}
+
+
+
+
+
+----------------Create Business--------------------
+mutation($bName:String!){
+createBusinesses(input:{bName:$bName}){
+businesses{
+bName
+}
+}
+}
+
+
+---------------------------Delete Business----------------------------
+mutation {
+    deleteBusinesses(where: {
+        bID: "62714cfe-73ee-4bf7-858e-8a87e87c7a30"
+    }) {
+        nodesDeleted
+        relationshipsDeleted
+    }
+}
+
+--------------------Adding Relation User->Business--------------------------
+mutation {
+  updateUsers(
+    update: {
+        businesses: {
+          connectOrCreate: {
+            where: { node: {bID:"7e0e8d69-d3cd-4adf-8bb2-a150d3fae450" } }
+            onCreate: { node: { bName: "AL Jawad" } }
+          }
+        }
+    },
+    where: { id: "44bcc081-da8d-468b-bacf-e26b80e91068" }
+  ) {
+    info {
+      nodesCreated
+    }
+  }
+}
+
+---------------------------------------------------------------Check relation if created---------------------------
+---------Darwich->>>>>>AlJawad-------------------------------
+query{
+  users {
+    name
+    businesses {
+      bName
+    }
+  }
+}
+--------------Mohammad NoureddinBonanzo
+mutation {
+  updateUsers(
+    update: {
+        businesses: {
+          connectOrCreate: {
+            where: { node: {bID:"6263f131-28b7-4da8-8be5-aaf15d33c63c" } }
+            onCreate: { node: { bName: "Bonanza" } }
+          }
+        }
+    },
+    where: { id: "e4eb2296-1b55-4ef9-99e6-8e8ab1cc5396" }
+  ) {
+    info {
+      nodesCreated
+    }
+  }
+}
+
+----------------Ali Moubarak>Mogetto------------------------------------------------------
+mutation {
+  updateUsers(
+    update: {
+        businesses: {
+          connectOrCreate: {
+            where: { node: {bID: "eb5a0f53-d5bc-4e34-a3c5-05825555b1cf"
+                           } }
+            onCreate: { node: { bName: "Mogettee"} }
+          }
+        }
+    },
+    where: { id: "8b7e2a24-5fe7-4415-b624-59d6409de160"
+}
+  ) {
+    info {
+      nodesCreated
+    }
+  }
+}
+
+
